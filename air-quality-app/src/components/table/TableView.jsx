@@ -74,19 +74,40 @@ const TableView = () => {
 
     const handleViewHistory = async (station) => {
         setSelectedStation(station);
+        
+        // Reset dateRange to default values if they are invalid
+        const now = new Date();
+        const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        
+        if (!dateRange.from || !dateRange.to || 
+            !(dateRange.from instanceof Date) || !(dateRange.to instanceof Date) ||
+            isNaN(dateRange.from) || isNaN(dateRange.to)) {
+            setDateRange({
+                from: weekAgo,
+                to: now
+            });
+        }
+        
         setShowHistoryModal(true);
 
         await fetchHistoricalData(station.id, {
-            from: dateRange.from,
-            to: dateRange.to
+            from: dateRange.from && !isNaN(dateRange.from) ? dateRange.from : weekAgo,
+            to: dateRange.to && !isNaN(dateRange.to) ? dateRange.to : now
         }, dataType);
     };
 
     const handleDateRangeChange = async () => {
+        // Validation: Check if dates are valid
+        if (!dateRange.from || !dateRange.to || 
+            !(dateRange.from instanceof Date) || !(dateRange.to instanceof Date) ||
+            isNaN(dateRange.from) || isNaN(dateRange.to)) {
+            alert('Please select valid From and To dates!');
+            return;
+        }
+
         // Validation: To date cannot be earlier than From date
         if (dateRange.to < dateRange.from) {
-
-            alert('To date cannot be earlier or equal to From date!');
+            alert('To date cannot be earlier than From date!');
             return;
         }
 
@@ -96,6 +117,13 @@ const TableView = () => {
                 to: dateRange.to
             }, dataType);
         }
+    };
+
+    const handleResetDateRange = () => {
+        setDateRange({
+            from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+            to: new Date()
+        });
     };
 
 
@@ -133,11 +161,15 @@ const TableView = () => {
                                 From:
                                 <input
                                     type="date"
-                                    value={dateRange.from.toISOString().split('T')[0]}
-                                    max={dateRange.to.toISOString().split('T')[0]}
+                                    value={dateRange.from && dateRange.from instanceof Date && !isNaN(dateRange.from) 
+                                        ? dateRange.from.toISOString().split('T')[0] 
+                                        : ''}
+                                    max={dateRange.to && dateRange.to instanceof Date && !isNaN(dateRange.to) 
+                                        ? dateRange.to.toISOString().split('T')[0] 
+                                        : ''}
                                     onChange={(e) => setDateRange(prev => ({
                                         ...prev,
-                                        from: new Date(e.target.value)
+                                        from: e.target.value ? new Date(e.target.value) : null
                                     }))}
                                 />
                             </label>
@@ -145,11 +177,15 @@ const TableView = () => {
                                 To:
                                 <input
                                     type="date"
-                                    value={dateRange.to.toISOString().split('T')[0]}
-                                    min={dateRange.from.toISOString().split('T')[0]}
+                                    value={dateRange.to && dateRange.to instanceof Date && !isNaN(dateRange.to) 
+                                        ? dateRange.to.toISOString().split('T')[0] 
+                                        : ''}
+                                    min={dateRange.from && dateRange.from instanceof Date && !isNaN(dateRange.from) 
+                                        ? dateRange.from.toISOString().split('T')[0] 
+                                        : ''}
                                     onChange={(e) => setDateRange(prev => ({
                                         ...prev,
-                                        to: new Date(e.target.value)
+                                        to: e.target.value ? new Date(e.target.value) : null
                                     }))}
                                 />
                             </label>
@@ -168,6 +204,9 @@ const TableView = () => {
                         </div>
                         <Button onClick={handleDateRangeChange} loading={historyLoading} size='small'>
                             Update
+                        </Button>
+                        <Button onClick={handleResetDateRange} variant="outline" size='small'>
+                            Reset
                         </Button>
                     </div>
 
