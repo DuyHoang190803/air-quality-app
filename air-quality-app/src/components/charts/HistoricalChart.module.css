@@ -1,0 +1,117 @@
+.chart-container {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.chart-title {
+  margin: 0 0 1.5rem 0;
+  color: #212529;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.custom-tooltip {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.tooltip-label {
+  font-weight: 600;
+  color: #212529;
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+}
+
+.tooltip-item {
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.tooltip-aqi {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 12px 0;
+  padding: 6px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.tooltip-aqi-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: white;
+  font-weight: 600;
+  font-size: 13px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  min-width: 55px;
+}
+
+.tooltip-aqi-level {
+  font-size: 11px;
+  font-weight: 600;
+  color: #495057;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.no-data {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
+.no-data-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 2px solid #dee2e6;
+  border-radius: 12px;
+  color: #6c757d;
+  font-weight: 500;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .chart-container {
+    padding: 1rem;
+  }
+
+  .chart-title {
+    font-size: 1.1rem;
+  }
+
+  .custom-tooltip {
+    padding: 0.5rem;
+  }
+
+  .tooltip-label,
+  .tooltip-item {
+    font-size: 0.8rem;
+  }
+
+  .tooltip-aqi-badge {
+    font-size: 11px;
+    padding: 3px 6px;
+    min-width: 45px;
+  }
+
+  .tooltip-aqi-level {
+    font-size: 10px;
+  }
+}

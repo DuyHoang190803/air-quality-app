@@ -1,0 +1,472 @@
+.map-view {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.map-container {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Station Markers */
+.station-marker {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  /* Ensure marker stays centered on coordinates */
+  transform-origin: center center;
+  position: absolute;
+  /* Prevent any positioning drift */
+  pointer-events: auto;
+  z-index: 1;
+}
+
+.station-marker:hover {
+  transform: scale(1.1);
+}
+
+.station-marker__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  position: relative;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  /* Center the icon on the coordinates */
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+}
+
+.station-marker--good .station-marker__icon {
+  background: #28a745;
+}
+
+.station-marker--moderate .station-marker__icon {
+  background: #ffc107;
+  color: #212529;
+}
+
+.station-marker--poor .station-marker__icon {
+  background: #fd7e14;
+}
+
+.station-marker--very-poor .station-marker__icon {
+  background: #dc3545;
+}
+
+.station-marker--unknown .station-marker__icon {
+  background: #6c757d;
+}
+
+.station-marker__name {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  white-space: nowrap;
+  margin-top: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.station-marker:hover .station-marker__name {
+  opacity: 1;
+}
+
+/* Station Info Panel */
+.station-info-panel {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 300px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+}
+
+.station-info-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.station-info-panel__header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #212529;
+}
+
+.station-info-panel__close {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #6c757d;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.station-info-panel__close:hover {
+  background: #f8f9fa;
+}
+
+.station-info-panel__content {
+  padding: 1rem;
+}
+
+.station-status {
+  margin-bottom: 1rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge--large {
+  padding: 8px 16px;
+  font-size: 1rem;
+}
+
+.measurements {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.measurement {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.measurement:last-child {
+  border-bottom: none;
+}
+
+.measurement label {
+  font-weight: 500;
+  color: #495057;
+}
+
+.measurement span {
+  font-weight: 600;
+  color: #212529;
+}
+
+/* Station Detail Modal */
+.station-detail {
+  max-width: 100%;
+}
+
+.station-detail__location {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.station-detail__location p {
+  margin: 0.5rem 0;
+  color: #6c757d;
+}
+
+.station-detail__status {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.station-detail__status h4 {
+  margin: 0 0 1rem 0;
+  color: #212529;
+}
+
+.station-detail__measurements h4 {
+  margin: 0 0 1rem 0;
+  color: #212529;
+}
+
+.measurements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.measurement-card {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.measurement-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.measurement-card__label {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.measurement-card__value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #212529;
+  margin-bottom: 0.25rem;
+}
+
+.measurement-card__unit {
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .station-info-panel {
+    width: calc(100% - 40px);
+    position: relative;
+    top: 0;
+    left: 0;
+    margin: 20px;
+  }
+
+  .measurements-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .measurements-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Map Controls */
+.map-controls {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 10;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+  pointer-events: none;
+}
+
+.map-controls>* {
+  pointer-events: auto;
+}
+
+.search-wrapper {
+  flex: 1;
+  min-width: 350px;
+  max-width: 400px;
+}
+
+.style-selector {
+  position: relative;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  padding: 3px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.style-selector:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.style-selector::before {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.style-selector::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid #666;
+  pointer-events: none;
+  z-index: 1;
+  transition: transform 0.2s ease;
+}
+
+.style-selector:focus-within::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.style-select {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c3e50;
+  cursor: pointer;
+  outline: none;
+  padding: 12px 40px 12px 40px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  min-width: 160px;
+}
+
+.style-select:focus {
+  background: rgba(59, 130, 246, 0.05);
+  color: #1e40af;
+}
+
+.style-select:hover {
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.style-select option {
+  background: white;
+  color: #2c3e50;
+  padding: 12px 16px;
+  font-weight: 500;
+  border-radius: 6px;
+  margin: 2px 0;
+}
+
+.station-counter {
+  background: rgba(40, 167, 69, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive Map Controls */
+@media (max-width: 768px) {
+  .map-controls {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    gap: 10px;
+  }
+
+  .search-wrapper {
+    min-width: 200px;
+    flex: 1;
+  }
+
+  .style-selector {
+    border-radius: 10px;
+    padding: 3px;
+  }
+
+  .style-selector::before {
+    font-size: 14px;
+    left: 10px;
+  }
+
+  .style-selector::after {
+    right: 10px;
+    border-top: 5px solid #666;
+  }
+
+  .style-select {
+    font-size: 13px;
+    min-width: 100px;
+    padding: 10px 32px 10px 32px;
+  }
+
+  .station-counter {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .map-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .search-wrapper {
+    min-width: auto;
+    max-width: none;
+  }
+
+  .style-selector {
+    align-self: flex-start;
+    min-width: 140px;
+    border-radius: 8px;
+  }
+
+  .style-selector::before {
+    font-size: 13px;
+    left: 8px;
+  }
+
+  .style-selector::after {
+    right: 8px;
+    border-top: 4px solid #666;
+  }
+
+  .style-select {
+    font-size: 12px;
+    padding: 8px 28px 8px 28px;
+    min-width: auto;
+  }
+
+  .station-counter {
+    align-self: flex-start;
+    min-width: 100px;
+  }
+}
