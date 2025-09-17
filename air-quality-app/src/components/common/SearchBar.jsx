@@ -1,6 +1,13 @@
 import styles from './SearchBar.module.css';
 
-const SearchBar = ({ searchQuery, onSearchChange, placeholder = "Search..." }) => {
+const SearchBar = ({ 
+  searchQuery, 
+  onSearchChange, 
+  placeholder = "Search...", 
+  className = '',
+  onFocus,
+  ...props 
+}) => {
   return (
     <div className={styles['search-container']}>
       <input
@@ -8,7 +15,9 @@ const SearchBar = ({ searchQuery, onSearchChange, placeholder = "Search..." }) =
         placeholder={placeholder}
         value={searchQuery}
         onChange={(e) => onSearchChange(e.target.value)}
-        className={styles['search-input']}
+        className={`${styles['search-input']} ${className}`}
+        onFocus={onFocus}
+        {...props}
       />
       <div className={styles['search-icon']}>
         🔍

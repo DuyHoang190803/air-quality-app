@@ -1,0 +1,45 @@
+.custom-tooltip {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(8px);
+    max-width: 280px;
+}
+
+.tooltip-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 8px 0;
+    font-size: 14px;
+}
+
+.tooltip-aqi {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+    padding: 6px 0;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.tooltip-aqi-badge {
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.tooltip-aqi-level {
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.tooltip-item {
+    margin: 4px 0;
+    font-size: 13px;
+    font-weight: 500;
+}

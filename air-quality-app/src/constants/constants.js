@@ -2,7 +2,6 @@
  * API Endpoints for Air Quality service
  */
 export const API_ENDPOINTS = {
-  CURRENT_DATA: 'CityDashboard.Environment.Tile',
   STATIONS_LIST: 'CityDashboard.Environment.List',
   HISTORICAL_DATA: 'CityDashboard.Environment.History',
 };
@@ -40,7 +39,6 @@ export const MAP_CONFIG = {
  * Data refresh intervals (in milliseconds)
  */
 export const REFRESH_INTERVALS = {
-  CURRENT_DATA: 5 * 60 * 1000, // 5 minutes
   STATIONS_LIST: 30 * 60 * 1000, // 30 minutes
 };
 

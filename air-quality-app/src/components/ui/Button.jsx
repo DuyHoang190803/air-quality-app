@@ -11,6 +11,8 @@ import styles from './Button.module.css';
  * @param {boolean} props.loading - Loading state
  * @param {function} props.onClick - Click handler
  * @param {string} props.className - Additional CSS classes
+ * @param {string} props.type - Button type ('button' | 'submit' | 'reset')
+ * @param {string} props.ariaLabel - Aria label for accessibility
  */
 export const Button = ({
   children,
@@ -20,6 +22,8 @@ export const Button = ({
   loading = false,
   onClick,
   className = '',
+  type = 'button', // Thêm type mặc định
+  ariaLabel, // Thêm aria-label support
   ...props
 }) => {
   const buttonClass = [
@@ -32,9 +36,12 @@ export const Button = ({
 
   return (
     <button
+      type={type}
       className={buttonClass}
       disabled={disabled || loading}
       onClick={onClick}
+      aria-label={ariaLabel}
+      aria-disabled={disabled || loading}
       {...props}
     >
       {loading && <span className={styles['btn__spinner']}></span>}

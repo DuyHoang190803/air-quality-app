@@ -9,7 +9,8 @@ import {
     Legend,
     ResponsiveContainer
 } from 'recharts';
-import { formatDate, calculateAQI } from '../../utils/helpers';
+import { formatDate } from '../../../utils/helpers';
+import ChartTooltip from './ChartTooltip';
 import styles from './HistoricalChart.module.css';
 
 /**
@@ -38,58 +39,10 @@ const HistoricalChart = React.memo(({
         })).filter(item => item.timestamp !== 'No Data');
     }, [data]);
 
-    // Custom tooltip formatter
-    const CustomTooltip = ({ active, payload, label }) => {
-        if (active && payload && payload.length) {
-            // Calculate AQI from the current data point
-            const currentData = chartData.find(item => item.timestamp === label);
-            let aqiInfo = null;
-
-            if (currentData) {
-                const stationData = {
-                    airPm25: currentData.PM25,
-                    airPm10: currentData.PM10,
-                    airNo2: currentData.NO2,
-                    airSo2: currentData.SO2,
-                    airO3: currentData.O3
-                };
-                aqiInfo = calculateAQI(stationData);
-            }
-
-            return (
-                <div className={styles['custom-tooltip']}>
-                    <p className={styles['tooltip-label']}>{`Time: ${label}`}</p>
-
-                    {/* AQI Display */}
-                    {aqiInfo && (
-                        <div className={styles['tooltip-aqi']}>
-                            <span
-                                className={styles['tooltip-aqi-badge']}
-                                style={{ backgroundColor: aqiInfo.color }}
-                            >
-                                AQI: {aqiInfo.aqi !== null ? aqiInfo.aqi : 'N/A'}
-                            </span>
-                            <span className={styles['tooltip-aqi-level']}>
-                                {aqiInfo.level}
-                            </span>
-                        </div>
-                    )}
-
-                    {/* Pollutants */}
-                    {payload.map((entry, index) => (
-                        <p
-                            key={index}
-                            className={styles['tooltip-item']}
-                            style={{ color: entry.color }}
-                        >
-                            {`${entry.dataKey}: ${entry.value ? entry.value.toFixed(2) : 'N/A'} µg/m³`}
-                        </p>
-                    ))}
-                </div>
-            );
-        }
-        return null;
-    };
+    // Create tooltip component with chart data
+    const TooltipComponent = (props) => (
+        <ChartTooltip {...props} chartData={chartData} />
+    );
 
     if (!chartData.length) {
         return (
@@ -130,7 +83,7 @@ const HistoricalChart = React.memo(({
                         fontSize={12}
                         label={{ value: 'Concentration (µg/m³)', angle: -90, position: 'insideLeft' }}
                     />
-                    <Tooltip content={<CustomTooltip />} />
+                    <Tooltip content={<TooltipComponent />} />
                     <Legend verticalAlign="top" height={36} />
 
                     <Line
@@ -184,6 +137,5 @@ const HistoricalChart = React.memo(({
     );
 });
 
-// HistoricalChart.displayName = 'HistoricalChart';
 
 export default HistoricalChart;

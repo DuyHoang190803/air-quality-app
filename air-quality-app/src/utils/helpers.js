@@ -87,11 +87,12 @@ export const normalizeString = (str) => {
  * @returns {number} AQI value
  */
 export const calculatePollutantAQI = (concentration, pollutant) => {
-    if (!concentration || concentration < 0) return 0;
+    // Handle invalid or negative concentrations
+    if (isNaN(concentration) || concentration < 0) return 0;
 
     const breakpoints = {
         pm25: [
-            { cLow: 0, cHigh: 12, aqiLow: 0, aqiHigh: 50 },
+            { cLow: 0, cHigh: 12.0, aqiLow: 0, aqiHigh: 50 },
             { cLow: 12.1, cHigh: 35.4, aqiLow: 51, aqiHigh: 100 },
             { cLow: 35.5, cHigh: 55.4, aqiLow: 101, aqiHigh: 150 },
             { cLow: 55.5, cHigh: 150.4, aqiLow: 151, aqiHigh: 200 },
@@ -143,16 +144,37 @@ export const calculatePollutantAQI = (concentration, pollutant) => {
         }
     }
 
-    // If concentration exceeds highest breakpoint, use the last one
-    if (!breakpoint && concentration > pollutantBreakpoints[pollutantBreakpoints.length - 1].cHigh) {
-        breakpoint = pollutantBreakpoints[pollutantBreakpoints.length - 1];
+    // Handle edge cases where concentration falls in gaps between ranges
+    if (!breakpoint) {
+        // Find the closest range
+        for (let i = 0; i < pollutantBreakpoints.length - 1; i++) {
+            const current = pollutantBreakpoints[i];
+            const next = pollutantBreakpoints[i + 1];
+            
+            // If concentration falls between two ranges, use the lower range
+            if (concentration > current.cHigh && concentration < next.cLow) {
+                // Use interpolation between the two ranges
+                const ratio = (concentration - current.cHigh) / (next.cLow - current.cHigh);
+                const aqi = current.aqiHigh + ratio * (next.aqiLow - current.aqiHigh);
+                return Math.round(aqi);
+            }
+        }
+        
+        // If concentration exceeds highest breakpoint, use the last one
+        if (concentration > pollutantBreakpoints[pollutantBreakpoints.length - 1].cHigh) {
+            breakpoint = pollutantBreakpoints[pollutantBreakpoints.length - 1];
+            // For values exceeding the highest breakpoint, calculate based on the last range
+            const aqi = ((breakpoint.aqiHigh - breakpoint.aqiLow) / (breakpoint.cHigh - breakpoint.cLow)) *
+                (concentration - breakpoint.cLow) + breakpoint.aqiLow;
+            return Math.round(Math.min(aqi, 500)); // Cap at 500
+        }
     }
 
     if (!breakpoint) return 0;
 
     // Calculate AQI using linear interpolation
-    const aqi = ((breakpoint.aqiHigh - breakpoint.aqiLow) / (breakpoint.cHigh - breakpoint.cLow)) * 
-                (concentration - breakpoint.cLow) + breakpoint.aqiLow;
+    const aqi = ((breakpoint.aqiHigh - breakpoint.aqiLow) / (breakpoint.cHigh - breakpoint.cLow)) *
+        (concentration - breakpoint.cLow) + breakpoint.aqiLow;
 
     return Math.round(aqi);
 };
@@ -163,7 +185,7 @@ export const calculatePollutantAQI = (concentration, pollutant) => {
  * @returns {Object} AQI information including value, level, and color
  */
 export const calculateAQI = (stationData) => {
-    if (!stationData) return { aqi: 0, level: 'N/A', color: '#ccc', description: 'No Record' };
+    if (!stationData) return { aqi: 0, level: 'No Data', color: '#999999', description: 'No Record' };
 
     const pollutants = [
         { key: 'airPm25', name: 'pm25' },
@@ -175,11 +197,13 @@ export const calculateAQI = (stationData) => {
 
     let maxAQI = 0;
     let dominantPollutant = '';
+    let hasValidData = false;
 
     // Calculate AQI for each pollutant and find the maximum
     pollutants.forEach(pollutant => {
         const concentration = parseFloat(stationData[pollutant.key]);
-        if (concentration && concentration > 0) {
+        if (!isNaN(concentration) && concentration >= 0) {
+            hasValidData = true;
             const aqi = calculatePollutantAQI(concentration, pollutant.name);
             if (aqi > maxAQI) {
                 maxAQI = aqi;
@@ -188,10 +212,16 @@ export const calculateAQI = (stationData) => {
         }
     });
 
+    // If no valid data found, return no data state
+    if (!hasValidData) {
+        return { aqi: 0, level: 'No Data', color: '#999999', description: 'No Record' };
+    }
+
     // Determine AQI level and color
     const getAQILevel = (aqi) => {
+        if (aqi === 0) return { level: 'No Data', color: '#999999', description: 'No Record' };
         if (aqi <= 50) return { level: 'Good', color: '#00e400', description: 'Air quality is good' };
-        if (aqi <= 100) return { level: 'Moderate', color: '#ffff00', description: 'Air quality is acceptable' };
+        if (aqi <= 100) return { level: 'Moderate', color: '#ffdd00', description: 'Air quality is acceptable' };
         if (aqi <= 150) return { level: 'Unhealthy for Sensitive Groups', color: '#ff7e00', description: 'May affect sensitive groups' };
         if (aqi <= 200) return { level: 'Unhealthy', color: '#ff0000', description: 'Health effects for everyone' };
         if (aqi <= 300) return { level: 'Very Unhealthy', color: '#8f3f97', description: 'Serious health effects' };

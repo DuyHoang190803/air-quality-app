@@ -1,4 +1,5 @@
-import { calculateAQI } from '../../utils/helpers.js';
+import { calculateAQI } from '../../../utils/helpers.js';
+import { Button } from '../../ui/Button';
 import styles from './StationInfoPanel.module.css';
 
 const StationInfoPanel = ({ station, onClose }) => {
@@ -10,12 +11,15 @@ const StationInfoPanel = ({ station, onClose }) => {
         <div className={styles['station-info-panel']}>
             <div className={styles['station-info-panel__header']}>
                 <h3>{station.name}</h3>
-                <button
+                <Button
+                    variant="ghost"
+                    size="small"
                     className={styles['station-info-panel__close']}
                     onClick={onClose}
+                    ariaLabel="Close station information panel"
                 >
                     ✕
-                </button>
+                </Button>
             </div>
 
             <div className={styles['station-info-panel__content']}>

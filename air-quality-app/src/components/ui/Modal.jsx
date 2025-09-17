@@ -31,9 +31,11 @@ export const Modal = ({
         <div className={styles['modal__header']}>
           <h3 className={styles['modal__title']}>{title}</h3>
           <button 
+            type="button"
             className={styles['modal__close']}
             onClick={onClose}
             aria-label="Close modal"
+            title="Close modal"
           >
             ✕
           </button>

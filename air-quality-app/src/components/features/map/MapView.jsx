@@ -1,10 +1,11 @@
 import { useRef, useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { useAppContext } from '../../contexts/AppContext.jsx';
-import { calculateAQI } from '../../utils/helpers.js';
+import { useAppContext } from '../../../contexts/AppContext.jsx';
+import { calculateAQI } from '../../../utils/helpers.js';
 import MapSearchBox from './MapSearchBox';
 import StationInfoPanel from './StationInfoPanel';
+import Dropdown from '../../ui/Dropdown';
 import styles from './MapView.module.css';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
@@ -18,6 +19,7 @@ const MapView = () => {
     const mapContainer = useRef(null);
     const map = useRef(null);
     const mapViewRef = useRef(null);
+    const markersRef = useRef([]);
 
     // Default coordinates
     const defaultCenter = [15.8419, 50.2103];
@@ -57,10 +59,12 @@ const MapView = () => {
         }
     };
 
+
     // Handle search focus - close station info panel
     const handleSearchFocus = () => {
         setSelectedStation(null);
     };
+
 
     // Handle map style change
     const handleMapStyleChange = (styleId) => {
@@ -82,26 +86,6 @@ const MapView = () => {
     };
 
 
-    // Handle click outside to deselect station
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            // If click is on map container but not on a station marker, deselect
-            if (mapContainer.current && mapContainer.current.contains(event.target)) {
-                // Let Mapbox handle station clicks, this will only trigger for empty map areas
-                return;
-            }
-
-            // If click is outside the entire map view, deselect station
-            if (mapViewRef.current && !mapViewRef.current.contains(event.target)) {
-                setSelectedStation(null);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [setSelectedStation]);
 
 
     // Initialize map only once
@@ -157,9 +141,6 @@ const MapView = () => {
             }
         };
     }, []);
-
-    // Store markers reference to manage them properly
-    const markersRef = useRef([]);
 
     // Function to add markers to the map
     const addMarkersToMap = () => {
@@ -267,6 +248,7 @@ const MapView = () => {
 
             // Add click handler for empty map areas to deselect station
             map.current.on('click', (e) => {
+
                 // Check if click was on a station
                 const features = map.current.queryRenderedFeatures(e.point, {
                     layers: ['stations-layer']
@@ -277,6 +259,7 @@ const MapView = () => {
                     setSelectedStation(null);
                 }
             });
+
 
             // Change cursor on hover
             map.current.on('mouseenter', 'stations-layer', () => {
@@ -314,6 +297,17 @@ const MapView = () => {
         // Cleanup timer and event listeners
         return () => {
             clearTimeout(timer);
+            // Additional cleanup for markers if component unmounts
+            if (markersRef.current.length > 0) {
+                markersRef.current.forEach(marker => {
+                    try {
+                        marker.remove();
+                    } catch (error) {
+                        console.warn('Error removing marker:', error);
+                    }
+                });
+                markersRef.current = [];
+            }
         };
     }, [filteredStations]);
 
@@ -331,38 +325,60 @@ const MapView = () => {
         }
     }, [selectedStation]);
 
+    // Cleanup all resources when component unmount
+    useEffect(() => {
+        return () => {
+            // Cleanup markers
+            if (markersRef.current.length > 0) {
+                markersRef.current.forEach(marker => {
+                    try {
+                        marker.remove();
+                    } catch (error) {
+                        console.warn('Error cleaning up marker on unmount:', error);
+                    }
+                });
+                markersRef.current = [];
+            }
+
+            // Additional cleanup 
+            if (map.current) {
+                try {
+                    map.current.off(); // Remove all event listeners
+                } catch (error) {
+                    console.warn('Error removing map event listeners:', error);
+                }
+            }
+        };
+    }, []); // Run once on mount, cleanup on unmount
 
 
     return (
         <div ref={mapViewRef} className={styles['map-view']}>
             {/* Map Controls */}
             <div className={styles['map-controls']}>
-                {/* Google Maps Style Search */}
+                {/* Search Station */}
                 <div className={styles['search-wrapper']}>
                     <MapSearchBox
                         onStationSelect={handleStationSelect}
                         onSearchFocus={handleSearchFocus}
                     />
-                </div>                {/* Map Style Selector */}
-                <div className={styles['style-selector']}>
-                    <select
-                        value={mapStyle}
-                        onChange={(e) => handleMapStyleChange(e.target.value)}
-                        className={styles['style-select']}
-                        title="Select Map Style"
-                    >
-                        {mapStyles.map(style => (
-                            <option key={style.id} value={style.id}>
-                                {style.name}
-                            </option>
-                        ))}
-                    </select>
                 </div>
 
-                {/* Station Counter */}
-                <div className={styles['station-counter']}>
-                    {filteredStations.length} stations
+                {/* Map Style Selector */}
+                <div className={styles['style-selector']}>
+                    <Dropdown
+                        value={mapStyle}
+                        onChange={handleMapStyleChange}
+                        options={mapStyles.map(style => ({
+                            value: style.id,
+                            label: style.name
+                        }))}
+                        placeholder="Select Map Style"
+                        className={styles['style-dropdown']}
+                    />
                 </div>
+
+
             </div>
 
             <div ref={mapContainer} className={styles['map-container']} />

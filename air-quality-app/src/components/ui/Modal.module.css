@@ -73,7 +73,7 @@
 }
 
 .modal__content {
-  padding: 1.5rem;
+  padding: 0 1.5rem;
   overflow-y: auto;
   max-height: calc(90vh - 80px);
 }

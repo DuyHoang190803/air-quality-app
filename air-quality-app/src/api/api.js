@@ -4,14 +4,6 @@ import { API_ENDPOINTS } from '../constants/constants';
 const API_BASE_URL = "/query";
 
 /**
- * Get data from all stations
- * @returns {Promise<Array>} Current measurements data
- */
-export const getCurrentMeasurements = () => {
-  return authorizedApi.post(`${API_BASE_URL}?name=${API_ENDPOINTS.CURRENT_DATA}`);
-};
-
-/**
  * Get list of all air quality stations
  * @returns {Promise<Array>} Stations list data
  */
@@ -41,7 +33,6 @@ export const getHistoricalData = (itemId, from, to, type = 'hourly') => {
 
 // Export all functions as an object for easier import
 export const airQualityAPI = {
-  getCurrentMeasurements,
   getStationsList,
   getHistoricalData,
 };
